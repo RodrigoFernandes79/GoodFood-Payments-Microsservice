@@ -1,0 +1,3 @@
+[submodule "eureka-server"]
+	path = eureka-server
+	url = git@github.com:RodrigoFernandes79/eureka-service-for-MS-goodfood.git

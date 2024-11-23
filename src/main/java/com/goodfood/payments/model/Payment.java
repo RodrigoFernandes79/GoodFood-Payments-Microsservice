@@ -31,15 +31,12 @@ public class Payment {
     @Size(max = 100)
     private String name;
 
-    @NotBlank
     @Size(max = 19)
     private String cardNumber;
 
-    @NotBlank
     @Size(max = 7)
     private String expiration;
 
-    @NotBlank
     @Size(min = 3, max = 3)
     private String code;
 

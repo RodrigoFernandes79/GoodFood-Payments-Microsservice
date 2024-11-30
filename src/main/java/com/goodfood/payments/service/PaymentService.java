@@ -67,4 +67,15 @@ public class PaymentService {
         paymentRepository.save(paymentFound);
         orderClient.updatePayment(paymentFound.getOrderId());
     }
+
+    public void updateStatus(Long id) {
+        Optional<Payment> payment = paymentRepository.findById(id);
+
+        if (payment.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+        var paymentFound = payment.get();
+        paymentFound.setStatus(Status.CONFIRMED_WITHOUT_INTEGRATION);
+        paymentRepository.save(paymentFound);
+    }
 }

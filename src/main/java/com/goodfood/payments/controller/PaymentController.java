@@ -48,5 +48,11 @@ public class PaymentController {
         paymentService.deletePayment(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("{id}/confirm-payment")
+    public void confirmPayment(@PathVariable @NotNull Long id) {
+
+        paymentService.confirmPayment(id);
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.goodfood.payments.service;
 
 import com.goodfood.payments.dto.PaymentDTO;
+import com.goodfood.payments.http.OrderClient;
 import com.goodfood.payments.model.Payment;
 import com.goodfood.payments.model.Status;
 import com.goodfood.payments.repository.PaymentRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class PaymentService {
@@ -20,6 +23,8 @@ public class PaymentService {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private OrderClient orderClient;
 
     public Page<PaymentDTO> findAll(Pageable pageable) {
         return paymentRepository.findAll(pageable)
@@ -49,5 +54,17 @@ public class PaymentService {
 
     public void deletePayment(Long id) {
         paymentRepository.deleteById(id);
+    }
+
+    public void confirmPayment(Long id) {
+        Optional<Payment> payment = paymentRepository.findById(id);
+
+        if (payment.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+        var paymentFound = payment.get();
+        paymentFound.setStatus(Status.CONFIRMED);
+        paymentRepository.save(paymentFound);
+        orderClient.updatePayment(paymentFound.getOrderId());
     }
 }

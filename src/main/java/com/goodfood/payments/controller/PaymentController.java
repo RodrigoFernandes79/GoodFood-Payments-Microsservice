@@ -2,6 +2,7 @@ package com.goodfood.payments.controller;
 
 import com.goodfood.payments.dto.PaymentDTO;
 import com.goodfood.payments.service.PaymentService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,17 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> deletePayment(@PathVariable @NotNull Long id) {
         paymentService.deletePayment(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("{id}/confirm-payment")
+    @CircuitBreaker(name = "updateOrder", fallbackMethod = "paymentAuthorizedWithPendingIntegration")
+    public void confirmPayment(@PathVariable @NotNull Long id) {
+
+        paymentService.confirmPayment(id);
+    }
+
+    public void paymentAuthorizedWithPendingIntegration(Long id, Exception e) {
+        paymentService.updateStatus(id);
     }
 }
 

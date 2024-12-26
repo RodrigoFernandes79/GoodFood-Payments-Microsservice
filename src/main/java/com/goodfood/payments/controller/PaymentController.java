@@ -5,6 +5,8 @@ import com.goodfood.payments.service.PaymentService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,8 @@ import java.net.URI;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @GetMapping
     public ResponseEntity<Page<PaymentDTO>> listAllPayment(@PageableDefault(size = 10) Pageable pageable) {
@@ -36,6 +40,9 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> registerPayment(@RequestBody @Valid PaymentDTO paymentDTO, UriComponentsBuilder builder) {
         PaymentDTO payment = paymentService.createPayment(paymentDTO);
         URI uri = builder.path("/payments/").buildAndExpand(payment.getId()).toUri();
+        //sending the message to RabbitMq Queue:
+        rabbitTemplate.convertAndSend ("payment.completed", payment);
+
         return ResponseEntity.created(uri).body(payment);
     }
 

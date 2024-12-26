@@ -40,10 +40,8 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> registerPayment(@RequestBody @Valid PaymentDTO paymentDTO, UriComponentsBuilder builder) {
         PaymentDTO payment = paymentService.createPayment(paymentDTO);
         URI uri = builder.path("/payments/").buildAndExpand(payment.getId()).toUri();
-        //creating the message:
-        Message message = new Message(("payment created with id: " + payment.getId()).getBytes());
         //sending the message to RabbitMq Queue:
-        rabbitTemplate.send("payment.completed", message);
+        rabbitTemplate.convertAndSend ("payment.completed", paymentDTO);
 
         return ResponseEntity.created(uri).body(payment);
     }

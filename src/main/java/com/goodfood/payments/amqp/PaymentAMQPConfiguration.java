@@ -1,6 +1,6 @@
 package com.goodfood.payments.amqp;
 
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -12,11 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PaymentAMQPConfiguration {
-    @Bean
-    public Queue createQueue() {
-        return new Queue("payment.completed", false);
-        //return QueueBuilder.nonDurable("payment.completed").build();
-    }
+
 
     @Bean
     public RabbitAdmin createRabbitAdmin(ConnectionFactory conn) {
@@ -40,5 +36,9 @@ public class PaymentAMQPConfiguration {
         return rabbitTemplate;
     }
 
+    @Bean
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange("payments.exchange");
+    }
 
 }

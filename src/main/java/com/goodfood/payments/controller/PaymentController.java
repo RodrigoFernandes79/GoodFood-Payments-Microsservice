@@ -5,7 +5,6 @@ import com.goodfood.payments.service.PaymentService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,7 @@ public class PaymentController {
         PaymentDTO payment = paymentService.createPayment(paymentDTO);
         URI uri = builder.path("/payments/").buildAndExpand(payment.getId()).toUri();
         //sending the message to RabbitMq Queue:
-        rabbitTemplate.convertAndSend ("payment.completed", payment);
+        rabbitTemplate.convertAndSend("payments.exchange", "", payment);
 
         return ResponseEntity.created(uri).body(payment);
     }
